@@ -1,0 +1,62 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Segoe UI, sans-serif;
+}
+
+body{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background: linear-gradient(135deg,#1e3c72,#2a5298);
+}
+
+.container{
+    text-align:center;
+}
+
+.title{
+    color:white;
+    margin-bottom:40px;
+    font-size:32px;
+    letter-spacing:1px;
+}
+
+.countdown{
+    display:flex;
+    gap:25px;
+    justify-content:center;
+}
+
+.bucket{
+    width:120px;
+    padding:25px;
+
+    background:white;
+    border-radius:12px;
+
+    box-shadow:0 10px 20px rgba(0,0,0,0.3);
+
+    text-align:center;
+
+    transition:transform 0.2s;
+}
+
+.bucket:hover{
+    transform:translateY(-6px);
+}
+
+.bucket span{
+    font-size:36px;
+    font-weight:bold;
+    color:#2a5298;
+}
+
+.bucket p{
+    margin-top:8px;
+    font-size:16px;
+    color:#555;
+}

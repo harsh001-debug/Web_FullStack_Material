@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>BMI Calculator</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>BMI Calculator</h1>
+
+    <div class="card">
+
+        <div class="form-group">
+            <label>Age</label>
+            <input type="number" id="age" placeholder="Between 2-120">
+        </div>
+
+        <div class="form-group gender">
+            <label>Gender</label>
+
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="gender" checked>
+                    Male
+                </label>
+
+                <label>
+                    <input type="radio" name="gender">
+                    Female
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Height (cm)</label>
+            <input type="number" id="height" placeholder="180">
+        </div>
+
+        <div class="form-group">
+            <label>Weight (kg)</label>
+            <input type="number" id="weight" placeholder="65">
+        </div>
+
+        <div class="buttons">
+            <button class="calculate">Calculate</button>
+            <button class="clear">Clear</button>
+        </div>
+
+        <!-- RESULT FIELD -->
+        <div class="result-box">
+            <h2>Your BMI</h2>
+            <p id="bmi-value">--</p>
+            <p id="bmi-status">Status will appear here</p>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>

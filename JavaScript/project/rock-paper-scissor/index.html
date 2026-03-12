@@ -1,0 +1,54 @@
+<!DOCTYPE html>  <!-- Tells browser: "Hey, this is HTML5!" -->
+<html lang="en"> <!-- The root - everything goes inside -->
+<head>
+    <!-- HEAD = Information ABOUT the page (not visible) -->
+    <meta charset="UTF-8"> <!-- Supports all characters/emojis -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <!-- Makes it mobile-friendly -->
+    
+    <title>Rock Paper Scissors Game</title> <!-- Tab name in browser -->
+    
+    <!-- LINKING CSS FILE - connects styling to structure -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- BODY = Everything user SEES -->
+    
+    <!-- Main container - wraps everything -->
+    <div class="container">
+        
+        <!-- Game title -->
+        <h1 class="game-title">Rock-Paper-Scissors Game</h1>
+        
+        <!-- Players section - holds both player boxes -->
+        <div class="players-container">
+            
+            <!-- Player 1 box -->
+            <div class="player-box">
+                <h2>Player 1</h2>
+                <!-- <div class="choice-display" id="player1-choice">?</div> -->
+                <h3 id="player1">?</h3>
+            </div>
+            
+            <!-- Player 2 box -->
+            <div class="player-box">
+                <h2>Player 2</h2>
+                <!-- <div class="choice-display" id="player2-choice">?</div> -->
+                 <h3 id="player2">?</h3>
+            </div>
+            
+        </div>
+        
+        <!-- Start button -->
+        <button class="start-btn">Start Game</button>
+        
+        <!-- Result display (hidden initially) -->
+        <div class="result-display" id="result">
+            Press Start to Play!
+        </div>
+        
+    </div>
+    <script src="./app.js"></script>
+    
+</body>
+</html>

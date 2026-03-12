@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App - Two Card Design</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    
+    <!-- Background animated elements -->
+    <div class="background-animation">
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        <div class="cloud cloud3"></div>
+    </div>
+    
+    <!-- Main Container - Two Cards -->
+    <div class="container">
+        
+        <!-- LEFT CARD - Search Section -->
+        <div class="left-card">
+            
+            <!-- Header -->
+            <div class="card-header">
+                <i class="fas fa-cloud-sun header-icon"></i>
+                <h1>Weather App</h1>
+                <p class="tagline">Real-time weather updates</p>
+            </div>
+            
+            <!-- Search Box -->
+            <div class="search-container">
+                <h2 class="search-title">Search Location</h2>
+                
+                <div class="search-box">
+                    <i class="fas fa-map-marker-alt search-icon"></i>
+                    <input 
+                        type="text" 
+                        id="city-input" 
+                        class="search-input" 
+                        placeholder="Enter city name..."
+                        autocomplete="off"
+                    >
+                </div>
+                
+                <button id="search-btn" class="search-btn">
+                    <i class="fas fa-search"></i>
+                    Get Weather
+                </button>
+            </div>
+            
+            <!-- Popular Cities Quick Access -->
+            <div class="popular-cities">
+                <h3 class="popular-title">Popular Cities</h3>
+                <div class="city-buttons">
+                    <button class="city-btn" data-city="London">
+                        <i class="fas fa-location-dot"></i>
+                        London
+                    </button>
+                    <button class="city-btn" data-city="New York">
+                        <i class="fas fa-location-dot"></i>
+                        New York
+                    </button>
+                    <button class="city-btn" data-city="Tokyo">
+                        <i class="fas fa-location-dot"></i>
+                        Tokyo
+                    </button>
+                    <button class="city-btn" data-city="Paris">
+                        <i class="fas fa-location-dot"></i>
+                        Paris
+                    </button>
+                    <button class="city-btn" data-city="Dubai">
+                        <i class="fas fa-location-dot"></i>
+                        Dubai
+                    </button>
+                    <button class="city-btn" data-city="Sydney">
+                        <i class="fas fa-location-dot"></i>
+                        Sydney
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Footer Info -->
+            <div class="left-footer">
+                <p><i class="fas fa-info-circle"></i> Enter any city to see current weather</p>
+            </div>
+            
+        </div>
+        
+        <!-- RIGHT CARD - Weather Display -->
+        <div class="right-card">
+            
+            <!-- Loading State -->
+            <div class="loading" id="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Fetching weather data...</p>
+            </div>
+            
+            <!-- Initial/Empty State -->
+            <div class="empty-state" id="empty-state">
+                <i class="fas fa-cloud-sun-rain empty-icon"></i>
+                <h2>No Location Selected</h2>
+                <p>Search for a city to view weather details</p>
+            </div>
+            
+            <!-- Weather Content -->
+            <div class="weather-content" id="weather-content">
+                
+                <!-- Location Header -->
+                <div class="weather-header">
+                    <div class="location-info">
+                        <i class="fas fa-map-marker-alt location-icon"></i>
+                        <div>
+                            <h2 id="city-name">New York</h2>
+                            <p id="date">Monday, Jan 15, 2024</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Temperature Display -->
+                <div class="main-weather">
+                    <div class="weather-icon-container">
+                        <i class="fas fa-sun weather-main-icon" id="weather-icon"></i>
+                    </div>
+                    <div class="temp-container">
+                        <h1 class="temperature" id="temperature">25°C</h1>
+                        <p class="weather-description" id="weather-desc">Clear Sky</p>
+                    </div>
+                </div>
+                
+                <!-- Weather Stats Grid -->
+                <div class="weather-stats">
+                    
+                    <!-- Feels Like -->
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-temperature-half"></i>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">Feels Like</p>
+                            <p class="stat-value" id="feels-like">27°C</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Humidity -->
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-droplet"></i>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">Humidity</p>
+                            <p class="stat-value" id="humidity">65%</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Wind Speed -->
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-wind"></i>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">Wind Speed</p>
+                            <p class="stat-value" id="wind-speed">12 km/h</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Pressure -->
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-gauge"></i>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">Pressure</p>
+                            <p class="stat-value" id="pressure">1013 mb</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Visibility -->
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">Visibility</p>
+                            <p class="stat-value" id="visibility">10 km</p>
+                        </div>
+                    </div>
+                    
+                    <!-- UV Index -->
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-sun"></i>
+                        </div>
+                        <div class="stat-info">
+                            <p class="stat-label">UV Index</p>
+                            <p class="stat-value" id="uv-index">5</p>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+            </div>
+            
+            <!-- Error Message -->
+            <div class="error-message" id="error-message">
+                <i class="fas fa-exclamation-triangle error-icon"></i>
+                <h3>City Not Found</h3>
+                <p>Please check the spelling and try again</p>
+            </div>
+            
+        </div>
+        
+    </div>
+    
+    <!-- Link to your JavaScript file -->
+    <script src="app.js"></script>
+    
+</body>
+</html>

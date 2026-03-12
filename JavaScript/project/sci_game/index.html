@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🧠 Sci-Charades Tournament</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#05080f;
+  --bg2:#090d18;
+  --surface:#0e1525;
+  --surface2:#131d30;
+  --border:#1e2d47;
+  --border2:#253550;
+  --r1:#00c9a7;   /* teal   – easy   */
+  --r2:#f7b731;   /* amber  – medium */
+  --r3:#fc5c65;   /* red    – hard   */
+  --gold:#ffd700;
+  --silver:#c0c0c0;
+  --bronze:#cd7f32;
+  --text:#e8edf5;
+  --muted:#5a6a82;
+  --ff:'Outfit',sans-serif;
+  --fd:'Bebas Neue',cursive;
+  --fm:'JetBrains Mono',monospace;
+}
+
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--ff);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── BACKGROUND GRID ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(0,201,167,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,201,167,.03) 1px,transparent 1px);
+  background-size:40px 40px;
+  pointer-events:none;z-index:0;
+}
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 20%,rgba(0,201,167,.07) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 80%,rgba(252,92,101,.06) 0%,transparent 60%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── LAYOUT ── */
+.wrap{max-width:860px;margin:0 auto;padding:2rem 1rem;position:relative;z-index:1}
+
+/* ── HERO HEADER ── */
+.hero{text-align:center;padding:3rem 0 2rem}
+.hero-badge{
+  display:inline-block;
+  background:rgba(0,201,167,.12);
+  border:1px solid rgba(0,201,167,.3);
+  color:var(--r1);
+  font-family:var(--fm);
+  font-size:.72rem;letter-spacing:.12em;
+  padding:.35rem 1rem;border-radius:2rem;
+  margin-bottom:1.2rem;
+  animation:fadeDown .6s ease both;
+}
+.hero h1{
+  font-family:var(--fd);
+  font-size:clamp(3rem,10vw,5.5rem);
+  line-height:.95;
+  letter-spacing:.04em;
+  margin-bottom:.6rem;
+  animation:fadeDown .6s .1s ease both;
+}
+.hero h1 span{color:var(--r1)}
+.hero p{
+  color:var(--muted);
+  font-family:var(--fm);
+  font-size:.85rem;
+  animation:fadeDown .6s .2s ease both;
+}
+
+/* ── ROUND TABS ── */
+.round-tabs{
+  display:flex;gap:.6rem;
+  margin-bottom:1.5rem;
+  border-bottom:1px solid var(--border);
+  padding-bottom:1rem;
+  flex-wrap:wrap;
+}
+.rtab{
+  font-family:var(--fd);font-size:1.1rem;letter-spacing:.06em;
+  padding:.5rem 1.4rem;border-radius:8px;
+  border:1px solid var(--border2);
+  background:var(--surface);
+  cursor:pointer;transition:all .2s;
+  color:var(--muted);
+}
+.rtab:hover{border-color:currentColor;color:var(--text)}
+.rtab.r1{--c:var(--r1)}
+.rtab.r2{--c:var(--r2)}
+.rtab.r3{--c:var(--r3)}
+.rtab.active{
+  background:rgba(0,0,0,.3);
+  border-color:var(--c);
+  color:var(--c);
+  box-shadow:0 0 16px -4px var(--c);
+}
+
+/* ── CARD ── */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:1.8rem;
+  margin-bottom:1.4rem;
+  animation:fadeUp .4s ease both;
+}
+.card-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1.4rem;flex-wrap:wrap;gap:.5rem;
+}
+.card-title{
+  font-family:var(--fd);font-size:1.4rem;letter-spacing:.06em;
+  display:flex;align-items:center;gap:.6rem;
+}
+.dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dot-r1{background:var(--r1);box-shadow:0 0 8px var(--r1)}
+.dot-r2{background:var(--r2);box-shadow:0 0 8px var(--r2)}
+.dot-r3{background:var(--r3);box-shadow:0 0 8px var(--r3)}
+
+/* ── FORM GRID ── */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.fg.single{grid-template-columns:1fr}
+.fg.three{grid-template-columns:1fr 1fr 1fr}
+.f{display:flex;flex-direction:column;gap:.4rem}
+.f.full{grid-column:1/-1}
+label{
+  font-family:var(--fm);font-size:.72rem;letter-spacing:.08em;
+  color:var(--muted);text-transform:uppercase;
+}
+input,select{
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:8px;
+  color:var(--text);
+  font-family:var(--ff);font-size:.9rem;
+  padding:.65rem 1rem;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s;
+  width:100%;
+}
+input:focus,select:focus{
+  border-color:var(--r1);
+  box-shadow:0 0 0 3px rgba(0,201,167,.12);
+}
+select option{background:var(--surface2)}
+
+/* ── BUTTONS ── */
+.btn{
+  font-family:var(--ff);font-weight:600;font-size:.88rem;
+  padding:.7rem 1.4rem;border-radius:8px;
+  border:none;cursor:pointer;
+  transition:all .2s;display:inline-flex;align-items:center;gap:.5rem;
+}
+.btn-primary{background:var(--r1);color:#05080f}
+.btn-primary:hover{filter:brightness(1.15);transform:translateY(-1px)}
+.btn-r2{background:var(--r2);color:#05080f}
+.btn-r2:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-r3{background:var(--r3);color:#fff}
+.btn-r3:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-ghost{
+  background:transparent;
+  border:1px solid var(--border2);
+  color:var(--muted);
+}
+.btn-ghost:hover{border-color:var(--r1);color:var(--r1)}
+.btn-xl{font-size:1rem;padding:.9rem 2rem;letter-spacing:.02em}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none!important;filter:none!important}
+
+.btn-row{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1.2rem}
+
+/* ── TEAM ENTRY LIST ── */
+.team-list{display:flex;flex-direction:column;gap:.8rem;margin-bottom:1rem}
+.team-entry{
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  border-radius:10px;padding:1rem 1.2rem;
+  position:relative;
+  animation:slideIn .3s ease both;
+}
+.team-entry-head{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:.8rem;
+}
+.team-num{
+  font-family:var(--fd);font-size:1.05rem;letter-spacing:.06em;color:var(--muted);
+}
+.rm-btn{
+  background:transparent;border:1px solid rgba(252,92,101,.3);
+  color:var(--r3);padding:.25rem .6rem;border-radius:6px;
+  font-size:.75rem;cursor:pointer;transition:all .15s;
+}
+.rm-btn:hover{background:rgba(252,92,101,.1)}
+
+/* ── RESULTS TABLE ── */
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.85rem;min-width:600px}
+thead{background:var(--surface2)}
+th{
+  padding:.8rem 1rem;text-align:left;
+  font-family:var(--fm);font-size:.7rem;
+  text-transform:uppercase;letter-spacing:.08em;
+  color:var(--muted);border-bottom:1px solid var(--border);
+  white-space:nowrap;
+}
+td{
+  padding:.7rem 1rem;
+  border-bottom:1px solid rgba(30,45,71,.5);
+}
+tr:last-child td{border-bottom:none}
+tr.winner-1 td{background:rgba(255,215,0,.08);color:var(--gold)}
+tr.winner-2 td{background:rgba(192,192,192,.07);color:var(--silver)}
+tr.winner-3 td{background:rgba(205,127,50,.07);color:var(--bronze)}
+tr.advanced td{background:rgba(0,201,167,.05)}
+tr.qualified td{background:rgba(247,183,49,.04)}
+tr.failed td{background:rgba(252,92,101,.04);opacity:.7}
+tr:hover td{filter:brightness(1.12)}
+
+/* ── STATUS BADGES ── */
+.badge{
+  display:inline-block;
+  font-family:var(--fm);font-size:.7rem;
+  padding:.2rem .6rem;border-radius:4px;
+  white-space:nowrap;
+}
+.b-win{background:rgba(255,215,0,.15);color:var(--gold);border:1px solid rgba(255,215,0,.3)}
+.b-adv{background:rgba(0,201,167,.15);color:var(--r1);border:1px solid rgba(0,201,167,.3)}
+.b-qual{background:rgba(247,183,49,.15);color:var(--r2);border:1px solid rgba(247,183,49,.3)}
+.b-fail{background:rgba(252,92,101,.12);color:var(--r3);border:1px solid rgba(252,92,101,.3)}
+
+/* ── STAT PILLS ── */
+.stats-row{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:1.2rem}
+.stat-pill{
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:8px;padding:.5rem 1rem;
+  font-family:var(--fm);font-size:.75rem;
+  display:flex;align-items:center;gap:.5rem;
+}
+.stat-pill span{font-size:1.1rem;font-weight:700}
+
+/* ── PODIUM ── */
+.podium{
+  display:flex;justify-content:center;align-items:flex-end;
+  gap:1rem;padding:2rem 1rem;flex-wrap:wrap;
+}
+.podium-block{
+  text-align:center;border-radius:12px 12px 0 0;
+  padding:1.5rem 1.2rem 1rem;min-width:140px;
+  position:relative;border:1px solid;
+  animation:riseUp .6s ease both;
+}
+.podium-block.p1{
+  background:linear-gradient(180deg,rgba(255,215,0,.15),rgba(255,215,0,.05));
+  border-color:rgba(255,215,0,.4);height:220px;
+  animation-delay:.1s;
+}
+.podium-block.p2{
+  background:linear-gradient(180deg,rgba(192,192,192,.12),rgba(192,192,192,.04));
+  border-color:rgba(192,192,192,.3);height:180px;
+  animation-delay:.2s;
+}
+.podium-block.p3{
+  background:linear-gradient(180deg,rgba(205,127,50,.12),rgba(205,127,50,.04));
+  border-color:rgba(205,127,50,.3);height:150px;
+  animation-delay:.3s;
+}
+.podium-medal{font-size:2.2rem;display:block;margin-bottom:.5rem}
+.podium-place{
+  font-family:var(--fd);font-size:1.6rem;letter-spacing:.06em;
+}
+.p1 .podium-place{color:var(--gold)}
+.p2 .podium-place{color:var(--silver)}
+.p3 .podium-place{color:var(--bronze)}
+.podium-names{
+  font-size:.82rem;font-weight:600;margin:.4rem 0 .2rem;
+  color:var(--text);
+}
+.podium-time{
+  font-family:var(--fm);font-size:.72rem;color:var(--muted);
+}
+
+/* ── SECTION HEADER ── */
+.sec-hdr{
+  display:flex;align-items:center;gap:.8rem;
+  margin-bottom:1rem;
+}
+.sec-line{flex:1;height:1px;background:var(--border)}
+.sec-label{
+  font-family:var(--fd);font-size:1rem;letter-spacing:.1em;
+  color:var(--muted);white-space:nowrap;
+}
+
+/* ── PHASE PANEL ── */
+.phase{display:none}
+.phase.active{display:block}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:1.5rem;right:1.5rem;
+  font-family:var(--fm);font-size:.8rem;
+  padding:.75rem 1.2rem;border-radius:8px;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+  z-index:1000;
+  transform:translateY(80px);opacity:0;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* ── DISQUALIFY ── */
+.dq-warning{
+  background:rgba(252,92,101,.08);
+  border:1px solid rgba(252,92,101,.3);
+  border-radius:8px;padding:.75rem 1rem;
+  font-size:.82rem;color:var(--r3);
+  margin-top:.6rem;display:none;
+}
+
+/* ── DOWNLOAD BAR ── */
+.dl-bar{
+  background:linear-gradient(135deg,rgba(0,201,167,.1),rgba(0,0,0,0));
+  border:1px solid rgba(0,201,167,.25);
+  border-radius:14px;padding:1.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:1rem;flex-wrap:wrap;
+  margin-top:1.5rem;
+}
+.dl-text h3{font-family:var(--fd);font-size:1.5rem;letter-spacing:.06em;color:var(--r1)}
+.dl-text p{font-family:var(--fm);font-size:.75rem;color:var(--muted);margin-top:.3rem}
+
+/* ── EMPTY STATE ── */
+.empty{
+  text-align:center;padding:3rem 1rem;
+  color:var(--muted);font-family:var(--fm);font-size:.82rem;
+}
+.empty-icon{font-size:2.5rem;opacity:.3;margin-bottom:.7rem}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+@keyframes riseUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ── PROGRESS STEPS ── */
+.steps{display:flex;align-items:center;gap:0;margin-bottom:2rem;flex-wrap:wrap;row-gap:.5rem}
+.step{
+  display:flex;align-items:center;gap:.4rem;
+  font-family:var(--fm);font-size:.75rem;color:var(--muted);
+}
+.step-num{
+  width:26px;height:26px;border-radius:50%;
+  border:2px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;font-weight:700;flex-shrink:0;
+  transition:all .3s;
+}
+.step.done .step-num{background:var(--r1);border-color:var(--r1);color:#05080f}
+.step.active .step-num{border-color:var(--r1);color:var(--r1);box-shadow:0 0 0 4px rgba(0,201,167,.15);animation:pulse 1.5s infinite}
+.step-line{flex:1;height:2px;background:var(--border);min-width:20px;max-width:50px;transition:background .3s}
+.step-line.done{background:var(--r1)}
+.step.active{color:var(--text)}
+.step.done{color:var(--r1)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:540px){
+  .fg{grid-template-columns:1fr}
+  .fg.three{grid-template-columns:1fr 1fr}
+  .f.full{grid-column:1}
+  .podium{gap:.5rem}
+  .podium-block{min-width:100px;padding:1rem .8rem .8rem}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-badge">⚡ TOURNAMENT MANAGEMENT SYSTEM</div>
+    <h1>🧠 SCI-<span>CHARADES</span></h1>
+    <p>// Scientific Terms · Team Acting · 3 Rounds · Excel Export</p>
+  </header>
+
+  <!-- PROGRESS STEPS -->
+  <div class="steps" id="progressSteps">
+    <div class="step active" id="st0"><div class="step-num">1</div>Setup</div>
+    <div class="step-line" id="sl0"></div>
+    <div class="step" id="st1"><div class="step-num">2</div>Round 1 · Easy</div>
+    <div class="step-line" id="sl1"></div>
+    <div class="step" id="st2"><div class="step-num">3</div>Round 2 · Medium</div>
+    <div class="step-line" id="sl2"></div>
+    <div class="step" id="st3"><div class="step-num">4</div>Round 3 · Difficult</div>
+    <div class="step-line" id="sl3"></div>
+    <div class="step" id="st4"><div class="step-num">5</div>Results</div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       PHASE 0 – SETUP
+  ══════════════════════════════════════════════ -->
+  <div class="phase active" id="phase0">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title"><div class="dot dot-r1"></div> Tournament Setup</div>
+      </div>
+      <p style="color:var(--muted);font-size:.88rem;margin-bottom:1.5rem;line-height:1.6">
+        Register teams before starting Round 1. Each team has 2 members.<br>
+        You can add teams here or directly in each round.
+      </p>
+
+      <!-- Team count to start -->
+      <div class="fg">
+        <div class="f">
+          <label>Number of teams in Round 1</label>
+          <input type="number" id="setupCount" min="1" max="200" placeholder="e.g. 10"/>
+        </div>
+        <div class="f" style="justify-content:flex-end;padding-top:1.4rem">
+          <button class="btn btn-primary btn-xl" onclick="startRound1()">
+            🚀 Start Tournament
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rules quick-ref -->
+    <div class="card">
+      <div class="card-head"><div class="card-title"><div class="dot dot-r2"></div>Game Rules Quick Reference</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;font-size:.84rem;line-height:1.7">
+        <div>
+          <p style="color:var(--r1);font-family:var(--fm);font-size:.72rem;margin-bottom:.4rem">⏱ TIME LIMIT</p>
+          <p style="color:var(--muted)">120 seconds per team per round</p>
+          <p style="color:var(--r1);font-family:var(--fm);font-size:.72rem;margin:1rem 0 .4rem">📊 THRESHOLD RULE</p>
+          <p style="color:var(--muted)">Threshold = ⌈Total Teams ÷ 2⌉<br>Only fastest teams within threshold advance</p>
+        </div>
+        <div>
+          <p style="color:var(--r2);font-family:var(--fm);font-size:.72rem;margin-bottom:.4rem">🏆 FINAL ROUND</p>
+          <p style="color:var(--muted)">Top 3 fastest teams win medals</p>
+          <p style="color:var(--r2);font-family:var(--fm);font-size:.72rem;margin:1rem 0 .4rem">⚠ ACTING RULES</p>
+          <p style="color:var(--muted)">No speaking, lip-sync, writing, or spelling. Body gestures only.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       PHASE 1/2/3 – ROUND INPUT
+  ══════════════════════════════════════════════ -->
+  <div class="phase" id="phase1"></div>
+  <div class="phase" id="phase2"></div>
+  <div class="phase" id="phase3"></div>
+
+  <!-- ══════════════════════════════════════════════
+       PHASE 4 – RESULTS
+  ══════════════════════════════════════════════ -->
+  <div class="phase" id="phase4"></div>
+
+</div><!-- /wrap -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════
+const state = {
+  currentPhase: 0,
+  teamIdCounter: 1,
+  allTeams: [],           // flat array of all team records
+  roundData: {1:[], 2:[], 3:[]}   // teams per round
+};
+
+const ROUND_LABELS = {1:'Easy',2:'Medium',3:'Difficult'};
+const ROUND_COLORS = {1:'r1',2:'r2',3:'r3'};
+const ROUND_DOTS   = {1:'dot-r1',2:'dot-r2',3:'dot-r3'};
+
+// ════════════════════════════════════════════════
+// UTILITIES
+// ════════════════════════════════════════════════
+function $(id){ return document.getElementById(id) }
+
+function toast(msg, color='#00c9a7'){
+  const el = $('toast');
+  el.textContent = msg;
+  el.style.background = color;
+  el.style.border = `1px solid ${color}44`;
+  el.style.color = color === '#00c9a7' ? '#05080f' : '#fff';
+  el.classList.add('show');
+  setTimeout(()=> el.classList.remove('show'), 2800);
+}
+
+function ceilDiv(a,b){ return Math.ceil(a/b) }
+
+function showPhase(n){
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+  $(`phase${n}`).classList.add('active');
+  state.currentPhase = n;
+  updateSteps(n);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateSteps(phase){
+  for(let i=0;i<=4;i++){
+    const st = $(`st${i}`);
+    const sl = $(`sl${i}`);
+    st.className = 'step' + (i<phase?' done':i===phase?' active':'');
+    if(sl) sl.className = 'step-line' + (i<phase?' done':'');
+  }
+}
+
+// ════════════════════════════════════════════════
+// PHASE 0 → START
+// ════════════════════════════════════════════════
+function startRound1(){
+  const n = parseInt($('setupCount').value) || 0;
+  if(n < 1){ toast('Enter at least 1 team','#fc5c65'); return; }
+  buildRoundPhase(1, n);
+  showPhase(1);
+}
+
+// ════════════════════════════════════════════════
+// BUILD ROUND INPUT PHASE
+// ════════════════════════════════════════════════
+function buildRoundPhase(round, teamCount){
+  const label   = ROUND_LABELS[round];
+  const col     = ROUND_COLORS[round];
+  const dotCls  = ROUND_DOTS[round];
+  const colVar  = `var(--${col})`;
+  const advFrom = round > 1 ? state.roundData[round-1].filter(t=>t.advanced) : [];
+
+  let html = `
+  <div class="card" id="roundCard${round}">
+    <div class="card-head">
+      <div class="card-title">
+        <div class="dot ${dotCls}"></div>
+        Round ${round} — ${label}
+      </div>
+      ${round > 1 ? `<span style="font-family:var(--fm);font-size:.75rem;color:var(--muted)">${advFrom.length} teams advanced in</span>` : ''}
+    </div>
+  `;
+
+  if(round > 1 && advFrom.length > 0){
+    html += `
+    <div class="stats-row">
+      ${advFrom.map(t=>`
+        <div class="stat-pill" style="border-color:${colVar}33">
+          <span style="color:${colVar}">⬆</span>
+          ${t.m1} & ${t.m2}
+        </div>`).join('')}
+    </div>`;
+  }
+
+  html += `
+    <div id="teamList${round}" class="team-list"></div>
+    <button class="btn btn-ghost" onclick="addTeamEntry(${round})" style="margin-bottom:1rem">
+      ＋ Add Team
+    </button>
+    <div class="btn-row">
+      <button class="btn btn-${col} btn-xl" onclick="submitRound(${round})">
+        ✅ Submit Round ${round} Results
+      </button>
+      ${round > 1 ? `<button class="btn btn-ghost" onclick="showPhase(${round-1})">← Back</button>` : ''}
+    </div>
+  </div>`;
+
+  $(`phase${round}`).innerHTML = html;
+
+  // Pre-fill teams
+  for(let i=0; i<teamCount; i++) addTeamEntry(round);
+}
+
+let entryCounters = {1:0,2:0,3:0};
+
+function addTeamEntry(round){
+  entryCounters[round] = (entryCounters[round]||0) + 1;
+  const idx  = entryCounters[round];
+  const col  = ROUND_COLORS[round];
+  const id   = `te_${round}_${idx}`;
+
+  const div = document.createElement('div');
+  div.className = 'team-entry';
+  div.id = id;
+  div.innerHTML = `
+    <div class="team-entry-head">
+      <div class="team-num">Team ${idx}</div>
+      <button class="rm-btn" onclick="removeEntry('${id}')">✕ Remove</button>
+    </div>
+    <div class="fg">
+      <div class="f">
+        <label>Member 1</label>
+        <input type="text" placeholder="e.g. Arjun Sharma" class="te-m1"/>
+      </div>
+      <div class="f">
+        <label>Member 2</label>
+        <input type="text" placeholder="e.g. Priya Patel" class="te-m2"/>
+      </div>
+      <div class="f">
+        <label>Scientific Word Given</label>
+        <input type="text" placeholder="e.g. Photosynthesis" class="te-word"/>
+      </div>
+      <div class="f">
+        <label>Time Taken (seconds)</label>
+        <input type="number" min="1" max="120" placeholder="1–120" class="te-time"/>
+      </div>
+      <div class="f">
+        <label>Did they guess correctly?</label>
+        <select class="te-qual" onchange="toggleDQ(this,'${id}')">
+          <option value="">— Select —</option>
+          <option value="yes">✅ Yes — Guessed correctly</option>
+          <option value="no">❌ No — Did not guess</option>
+          <option value="dq">🚫 Disqualified (cheating)</option>
+        </select>
+      </div>
+      <div class="f" style="justify-content:flex-end;padding-top:1.4rem">
+        <div style="font-family:var(--fm);font-size:.72rem;color:var(--muted)">
+          Max time: 120s · DQ = instant elimination
+        </div>
+      </div>
+    </div>
+    <div class="dq-warning" id="dqw_${id}">
+      ⚠ DISQUALIFIED — This team will be immediately eliminated from the tournament (Fair Play Policy §10).
+    </div>
+  `;
+
+  $(`teamList${round}`).appendChild(div);
+}
+
+function removeEntry(id){
+  const el = $(id);
+  if(el) el.remove();
+}
+
+function toggleDQ(sel, id){
+  const dqw = $('dqw_' + id);
+  if(dqw) dqw.style.display = sel.value === 'dq' ? 'block' : 'none';
+  // If no guess, time not needed
+  const entry = $(id);
+  if(!entry) return;
+  const timeInput = entry.querySelector('.te-time');
+  if(sel.value === 'no' || sel.value === 'dq'){
+    timeInput.value = 120;
+    timeInput.disabled = true;
+    timeInput.style.opacity = '.4';
+  } else {
+    timeInput.disabled = false;
+    timeInput.style.opacity = '1';
+    if(timeInput.value == 120) timeInput.value = '';
+  }
+}
+
+// ════════════════════════════════════════════════
+// SUBMIT ROUND
+// ════════════════════════════════════════════════
+function submitRound(round){
+  const entries = $(`teamList${round}`).querySelectorAll('.team-entry');
+  if(entries.length === 0){ toast('Add at least one team!','#fc5c65'); return; }
+
+  const teams = [];
+  let errors = 0;
+
+  entries.forEach((entry, i) => {
+    const m1   = entry.querySelector('.te-m1').value.trim();
+    const m2   = entry.querySelector('.te-m2').value.trim();
+    const word = entry.querySelector('.te-word').value.trim();
+    const qual = entry.querySelector('.te-qual').value;
+    const timeVal = parseFloat(entry.querySelector('.te-time').value);
+
+    if(!m1||!m2||!word||!qual){ errors++; entry.style.border='1px solid var(--r3)'; return; }
+    else entry.style.border = '1px solid var(--border2)';
+
+    const qualified = qual === 'yes';
+    const dq        = qual === 'dq';
+    const time      = (qualified && timeVal >= 1 && timeVal <= 120) ? timeVal : 120;
+
+    teams.push({
+      id:      state.teamIdCounter++,
+      m1, m2, word,
+      time,
+      qualified: qualified && !dq,
+      dq,
+      advanced: false,
+      round,
+      roundLabel: ROUND_LABELS[round],
+      rank: 0
+    });
+  });
+
+  if(errors > 0){ toast(`Fix ${errors} incomplete team(s)`, '#fc5c65'); return; }
+  if(teams.length === 0){ toast('No valid teams found','#fc5c65'); return; }
+
+  // Apply threshold / final logic
+  const isFinal = round === 3;
+  const total   = teams.length;
+  const threshold = ceilDiv(total, 2);
+
+  let qualified = teams.filter(t => t.qualified && !t.dq);
+  qualified.sort((a,b) => a.time - b.time);
+
+  let advancing = [];
+  if(isFinal){
+    advancing = qualified.slice(0, 3);
+    advancing.forEach((t,i) => { t.rank = i+1; t.advanced = true; });
+  } else {
+    if(qualified.length <= threshold){
+      advancing = qualified;
+    } else {
+      advancing = qualified.slice(0, threshold);
+    }
+    advancing.forEach(t => t.advanced = true);
+  }
+
+  // Store
+  state.roundData[round] = teams;
+  teams.forEach(t => state.allTeams.push(t));
+
+  // Show round summary
+  showRoundSummary(round, teams, threshold, advancing.length, isFinal);
+}
+
+// ════════════════════════════════════════════════
+// ROUND SUMMARY (shown after submit)
+// ════════════════════════════════════════════════
+function showRoundSummary(round, teams, threshold, advCount, isFinal){
+  const label  = ROUND_LABELS[round];
+  const col    = ROUND_COLORS[round];
+  const colVar = `var(--${col})`;
+  const total  = teams.length;
+  const qualCount = teams.filter(t=>t.qualified).length;
+  const sorted = [...teams].sort((a,b)=>a.time-b.time);
+
+  let tableRows = sorted.map((t,i) => {
+    let cls = t.rank > 0 ? `winner-${t.rank}` : t.advanced ? 'advanced' : t.qualified ? 'qualified' : 'failed';
+    let status = '';
+    if(t.dq) status = '<span class="badge b-fail">🚫 DQ</span>';
+    else if(t.rank===1) status = '<span class="badge b-win">🥇 1st</span>';
+    else if(t.rank===2) status = '<span class="badge b-win" style="color:var(--silver)">🥈 2nd</span>';
+    else if(t.rank===3) status = '<span class="badge b-win" style="color:var(--bronze)">🥉 3rd</span>';
+    else if(t.advanced) status = '<span class="badge b-adv">⬆ Advanced</span>';
+    else if(t.qualified) status = '<span class="badge b-qual">✅ Qualified</span>';
+    else status = '<span class="badge b-fail">❌ Eliminated</span>';
+
+    return `<tr class="${cls}">
+      <td style="color:var(--muted);font-family:var(--fm)">${i+1}</td>
+      <td>${t.m1}</td>
+      <td>${t.m2}</td>
+      <td style="font-family:var(--fm)">${t.word}</td>
+      <td style="font-family:var(--fm)">${t.time.toFixed(1)}s</td>
+      <td>${t.qualified&&!t.dq ? '✅' : t.dq ? '🚫' : '❌'}</td>
+      <td>${status}</td>
+    </tr>`;
+  }).join('');
+
+  const nextBtns = isFinal
+    ? `<button class="btn btn-primary btn-xl" onclick="showResults()">🏆 See Final Results</button>`
+    : `<button class="btn btn-${ROUND_COLORS[round+1]} btn-xl" onclick="proceedToRound(${round+1},${advCount})">
+        ➡ Proceed to Round ${round+1} · ${ROUND_LABELS[round+1]}
+       </button>
+       <button class="btn btn-ghost" onclick="showResults()">📊 Skip to Results</button>`;
+
+  const html = `
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title"><div class="dot ${ROUND_DOTS[round]}"></div>Round ${round} — ${label} · Results</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-pill"><span>${total}</span> Total Teams</div>
+      <div class="stat-pill" style="border-color:rgba(0,201,167,.3)">
+        <span style="color:var(--r1)">${qualCount}</span> Qualified
+      </div>
+      <div class="stat-pill" style="border-color:rgba(247,183,49,.3)">
+        <span style="color:var(--r2)">${threshold}</span> Threshold
+      </div>
+      <div class="stat-pill" style="border-color:${colVar}33">
+        <span style="color:${colVar}">${advCount}</span> ${isFinal?'Winners':'Advancing'}
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Member 1</th><th>Member 2</th>
+            <th>Word</th><th>Time</th><th>Guessed?</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </div>
+    <div class="btn-row">${nextBtns}</div>
+  </div>`;
+
+  $(`phase${round}`).innerHTML = html;
+  toast(`Round ${round} submitted! ${advCount} team(s) advancing.`);
+}
+
+// ════════════════════════════════════════════════
+// PROCEED TO NEXT ROUND
+// ════════════════════════════════════════════════
+function proceedToRound(round, advCount){
+  buildRoundPhase(round, advCount);
+  showPhase(round);
+}
+
+// ════════════════════════════════════════════════
+// FINAL RESULTS
+// ════════════════════════════════════════════════
+function showResults(){
+  const all = state.allTeams;
+  if(all.length === 0){ toast('No data yet','#fc5c65'); return; }
+
+  const winners = all.filter(t=>t.rank>0).sort((a,b)=>a.rank-b.rank);
+
+  // Podium
+  let podiumHtml = '';
+  const order = [2,1,3]; // silver left, gold center, bronze right
+  order.forEach(pos => {
+    const w = winners.find(t=>t.rank===pos);
+    if(!w) return;
+    const medals = {1:'🥇',2:'🥈',3:'🥉'};
+    const places = {1:'1st Place',2:'2nd Place',3:'3rd Place'};
+    const pcls   = {1:'p1',2:'p2',3:'p3'};
+    podiumHtml += `
+    <div class="podium-block ${pcls[pos]}">
+      <span class="podium-medal">${medals[pos]}</span>
+      <div class="podium-place">${places[pos]}</div>
+      <div class="podium-names">${w.m1}<br>${w.m2}</div>
+      <div class="podium-time">${w.time.toFixed(1)}s · ${w.word}</div>
+    </div>`;
+  });
+
+  // All-rounds table
+  const roundSections = [1,2,3].map(r => {
+    const rTeams = state.roundData[r];
+    if(!rTeams||rTeams.length===0) return '';
+    const sorted = [...rTeams].sort((a,b)=>a.time-b.time);
+    const rows = sorted.map((t,i)=>{
+      let cls = t.rank>0?`winner-${t.rank}`:t.advanced?'advanced':t.qualified?'qualified':'failed';
+      let status = t.dq ? '<span class="badge b-fail">🚫 DQ</span>'
+        : t.rank===1 ? '<span class="badge b-win">🥇 1st</span>'
+        : t.rank===2 ? '<span class="badge b-win" style="color:var(--silver)">🥈 2nd</span>'
+        : t.rank===3 ? '<span class="badge b-win" style="color:var(--bronze)">🥉 3rd</span>'
+        : t.advanced ? '<span class="badge b-adv">⬆ Advanced</span>'
+        : t.qualified? '<span class="badge b-qual">✅ Qualified</span>'
+        : '<span class="badge b-fail">❌ Out</span>';
+      return `<tr class="${cls}">
+        <td style="color:var(--muted);font-family:var(--fm)">${i+1}</td>
+        <td>T${String(t.id).padStart(3,'0')}</td>
+        <td>${t.m1}</td><td>${t.m2}</td>
+        <td style="font-family:var(--fm)">${t.word}</td>
+        <td style="font-family:var(--fm)">${t.time.toFixed(1)}s</td>
+        <td>${status}</td>
+      </tr>`;
+    }).join('');
+    return `
+    <div class="sec-hdr"><div class="sec-line"></div>
+      <div class="sec-label">Round ${r} · ${ROUND_LABELS[r]}</div>
+      <div class="sec-line"></div>
+    </div>
+    <div class="tbl-wrap" style="margin-bottom:1.2rem">
+      <table>
+        <thead><tr>
+          <th>#</th><th>ID</th><th>Member 1</th><th>Member 2</th>
+          <th>Word</th><th>Time</th><th>Status</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }).join('');
+
+  const html = `
+  <!-- PODIUM -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title"><div class="dot dot-r1"></div>🏆 Champions Podium</div>
+    </div>
+    ${winners.length > 0
+      ? `<div class="podium">${podiumHtml}</div>`
+      : `<div class="empty"><div class="empty-icon">🏆</div>No winners recorded yet.</div>`
+    }
+  </div>
+
+  <!-- ALL ROUNDS TABLE -->
+  <div class="card">
+    <div class="card-head">
+      <div class="card-title"><div class="dot dot-r2"></div>All Teams · All Rounds</div>
+    </div>
+    ${roundSections || '<div class="empty"><div class="empty-icon">📋</div>No round data.</div>'}
+  </div>
+
+  <!-- DOWNLOAD -->
+  <div class="dl-bar">
+    <div class="dl-text">
+      <h3>📥 Export Results</h3>
+      <p>Download a colorful, structured Excel workbook with all round data, rankings & winner sheet</p>
+    </div>
+    <div style="display:flex;gap:.7rem;flex-wrap:wrap">
+      <button class="btn btn-primary btn-xl" onclick="downloadExcel()">📊 Download Excel (.xlsx)</button>
+      <button class="btn btn-ghost" onclick="downloadCSV()">⬇ Download CSV</button>
+    </div>
+  </div>
+  `;
+
+  $('phase4').innerHTML = html;
+  showPhase(4);
+}
+
+// ════════════════════════════════════════════════
+// EXCEL EXPORT (SheetJS — real .xlsx)
+// ════════════════════════════════════════════════
+function downloadExcel(){
+  const wb = XLSX.utils.book_new();
+
+  // ── COLOR CONSTANTS ──
+  const C = {
+    titleBg:  "1A1A2E", titleFg:  "E0E0FF",
+    hdrR1:    "0A4D3C", hdrR2:    "5A3200", hdrR3:    "5C1000",
+    hdrFg:    "FFFFFF",
+    win1:     "FFF9E0", win1Fg:   "7A5800",
+    win2:     "F0F0F0", win2Fg:   "555555",
+    win3:     "FFF0E0", win3Fg:   "7A3A00",
+    adv:      "E8FAF4", advFg:    "1B5E20",
+    qual:     "FFFDE7", qualFg:   "5D4037",
+    fail:     "FFF0F0", failFg:   "7F2020",
+    altRow:   "F9FAFB",
+    border:   "B0BEC5"
+  };
+
+  const thinBorder = {
+    top:    {style:'thin',color:{rgb:C.border}},
+    bottom: {style:'thin',color:{rgb:C.border}},
+    left:   {style:'thin',color:{rgb:C.border}},
+    right:  {style:'thin',color:{rgb:C.border}}
+  };
+
+  function makeStyle(bgHex, fgHex='000000', bold=false, sz=10, center=false){
+    return {
+      font:      {name:'Arial', sz, bold, color:{rgb:fgHex}},
+      fill:      {fgColor:{rgb:bgHex}},
+      alignment: {horizontal: center?'center':'left', vertical:'center', wrapText:true},
+      border:    thinBorder
+    };
+  }
+
+  function makeTitleStyle(bgHex, fgHex, sz=14){
+    return {
+      font:      {name:'Arial', sz, bold:true, color:{rgb:fgHex}},
+      fill:      {fgColor:{rgb:bgHex}},
+      alignment: {horizontal:'center',vertical:'center'},
+      border:    thinBorder
+    };
+  }
+
+  const hdrStyle = (bg) => makeStyle(bg, C.hdrFg, true, 10, true);
+  const rowStyle = (bg,fg,bold=false) => makeStyle(bg,fg,bold,9);
+
+  function rowBg(t, idx){
+    if(t.rank===1) return [C.win1, C.win1Fg, true];
+    if(t.rank===2) return [C.win2, C.win2Fg, true];
+    if(t.rank===3) return [C.win3, C.win3Fg, true];
+    if(t.advanced)  return [C.adv,  C.advFg,  false];
+    if(t.qualified) return [C.qual, C.qualFg, false];
+    return [idx%2===0 ? C.altRow : 'FFFFFF', C.fail.replace('FFF0F0','888888'), false];
+  }
+
+  function statusText(t){
+    if(t.dq)        return '🚫 Disqualified';
+    if(t.rank===1)  return '🥇 1st Place';
+    if(t.rank===2)  return '🥈 2nd Place';
+    if(t.rank===3)  return '🥉 3rd Place';
+    if(t.advanced)  return '✅ Advanced';
+    if(t.qualified) return '🟡 Qualified';
+    return '❌ Eliminated';
+  }
+
+  // ── SHEET 1: OVERVIEW ──────────────────────────────
+  {
+    const wsData = [];
+    const merges = [];
+    const styles = {};
+
+    // Title row
+    wsData.push(['🧠 SCI-CHARADES — COMPLETE TOURNAMENT RESULTS','','','','','','','','','']);
+    merges.push({s:{r:0,c:0},e:{r:0,c:9}});
+    styles['A1'] = makeTitleStyle(C.titleBg, C.titleFg, 16);
+
+    // Sub
+    wsData.push(['All Rounds · Sorted by Time (Ascending) · Winner Teams Highlighted','','','','','','','','','']);
+    merges.push({s:{r:1,c:0},e:{r:1,c:9}});
+    styles['A2'] = makeTitleStyle('2C2C54','9090C0',9);
+
+    // Legend
+    wsData.push(['🥇 Gold = 1st   🥈 Silver = 2nd   🥉 Bronze = 3rd   🟢 Advanced   🟡 Qualified   🔴 Eliminated','','','','','','','','','']);
+    merges.push({s:{r:2,c:0},e:{r:2,c:9}});
+    styles['A3'] = makeTitleStyle('F5F5F5','444444',9);
+
+    // Headers
+    const hdrs = ['#','Team ID','Member 1','Member 2','Scientific Word','Round','Difficulty','Time (s)','Qualified?','Status'];
+    wsData.push(hdrs);
+    hdrs.forEach((_,ci) => {
+      styles[XLSX.utils.encode_cell({r:3,c:ci})] = hdrStyle('37474F');
+    });
+
+    // All teams sorted by round then time
+    const sorted = [...state.allTeams].sort((a,b)=> a.round!==b.round ? a.round-b.round : a.time-b.time);
+    sorted.forEach((t,i) => {
+      const [bg,fg,bold] = rowBg(t,i);
+      const row = [
+        i+1, `T${String(t.id).padStart(3,'0')}`,
+        t.m1, t.m2, t.word,
+        t.round, t.roundLabel,
+        parseFloat(t.time.toFixed(1)),
+        t.qualified&&!t.dq ? '✅ Yes' : t.dq ? '🚫 DQ' : '❌ No',
+        statusText(t)
+      ];
+      wsData.push(row);
+      row.forEach((_,ci)=>{
+        styles[XLSX.utils.encode_cell({r:4+i,c:ci})] = rowStyle(bg,fg,bold);
+      });
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!merges'] = merges;
+    ws['!cols'] = [{wch:5},{wch:9},{wch:18},{wch:18},{wch:22},{wch:7},{wch:12},{wch:10},{wch:13},{wch:18}];
+    ws['!rows'] = [{hpt:36},{hpt:20},{hpt:18},{hpt:22}];
+    Object.assign(ws, Object.fromEntries(Object.entries(styles).map(([k,v])=>[k,{...ws[k],s:v}])));
+    XLSX.utils.book_append_sheet(wb, ws, '📋 Overview');
+  }
+
+  // ── SHEETS 2-4: PER ROUND ──────────────────────────
+  [1,2,3].forEach(rnd => {
+    const rTeams = state.roundData[rnd];
+    if(!rTeams||rTeams.length===0) return;
+
+    const label  = ROUND_LABELS[rnd];
+    const hdrBgs = {1:C.hdrR1, 2:C.hdrR2, 3:C.hdrR3};
+    const bg     = hdrBgs[rnd];
+    const total  = rTeams.length;
+    const qualC  = rTeams.filter(t=>t.qualified&&!t.dq).length;
+    const advC   = rTeams.filter(t=>t.advanced).length;
+    const thresh = ceilDiv(total,2);
+    const sorted = [...rTeams].sort((a,b)=>a.time-b.time);
+
+    const wsData = [];
+    const merges = [];
+    const styles = {};
+
+    // Title
+    wsData.push([`⚡ ROUND ${rnd} — ${label.toUpperCase()}  ·  SCI-CHARADES`,'','','','','','','','']);
+    merges.push({s:{r:0,c:0},e:{r:0,c:8}});
+    styles['A1'] = makeTitleStyle(bg, 'FFFFFF', 14);
+
+    // Stats
+    wsData.push([`Teams: ${total}   |   Qualified: ${qualC}   |   Threshold: ${thresh}   |   Advanced: ${advC}`,'','','','','','','','']);
+    merges.push({s:{r:1,c:0},e:{r:1,c:8}});
+    styles['A2'] = makeTitleStyle('ECEFF1','37474F',9);
+
+    // Headers
+    const hdrs = ['Rank','Team ID','Member 1','Member 2','Word Given','Time (s)','Qualified?','Advanced?','Status'];
+    wsData.push(hdrs);
+    hdrs.forEach((_,ci)=>{ styles[XLSX.utils.encode_cell({r:2,c:ci})] = hdrStyle(bg); });
+
+    sorted.forEach((t,i)=>{
+      const [rbg,rfg,rbold] = rowBg(t,i);
+      let rankStr = t.rank===1?'🥇 1st':t.rank===2?'🥈 2nd':t.rank===3?'🥉 3rd':t.advanced?`#${i+1}`:'—';
+      const row = [
+        rankStr, `T${String(t.id).padStart(3,'0')}`,
+        t.m1, t.m2, t.word,
+        parseFloat(t.time.toFixed(1)),
+        t.qualified&&!t.dq?'✅ Yes':t.dq?'🚫 DQ':'❌ No',
+        t.advanced?'⬆ Yes':'—',
+        statusText(t)
+      ];
+      wsData.push(row);
+      row.forEach((_,ci)=>{ styles[XLSX.utils.encode_cell({r:3+i,c:ci})] = rowStyle(rbg,rfg,rbold); });
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!merges'] = merges;
+    ws['!cols'] = [{wch:9},{wch:9},{wch:18},{wch:18},{wch:22},{wch:10},{wch:12},{wch:12},{wch:18}];
+    ws['!rows'] = [{hpt:32},{hpt:18},{hpt:20}];
+    Object.assign(ws, Object.fromEntries(Object.entries(styles).map(([k,v])=>[k,{...ws[k],s:v}])));
+    XLSX.utils.book_append_sheet(wb, ws, `Round ${rnd} · ${label}`);
+  });
+
+  // ── SHEET 5: WINNERS PODIUM ────────────────────────
+  {
+    const winners = state.allTeams.filter(t=>t.rank>0).sort((a,b)=>a.rank-b.rank);
+    const wsData  = [];
+    const merges  = [];
+    const styles  = {};
+
+    wsData.push(['🏆  SCI-CHARADES CHAMPIONS','','','','','','']);
+    merges.push({s:{r:0,c:0},e:{r:0,c:6}});
+    styles['A1'] = makeTitleStyle('1A1A2E','FFD700',18);
+
+    wsData.push(['Top teams with fastest guessing times — Final Round · Difficult','','','','','','']);
+    merges.push({s:{r:1,c:0},e:{r:1,c:6}});
+    styles['A2'] = makeTitleStyle('2C2C54','9090C0',9);
+
+    const hdrs = ['Place','Medal','Member 1','Member 2','Scientific Word','Time (s)','✅ Status'];
+    wsData.push(hdrs);
+    hdrs.forEach((_,ci)=>{ styles[XLSX.utils.encode_cell({r:2,c:ci})] = hdrStyle('37474F'); });
+
+    if(winners.length===0){
+      wsData.push(['No winners recorded.','','','','','','']);
+      merges.push({s:{r:3,c:0},e:{r:3,c:6}});
+      styles['A4'] = makeStyle('F5F5F5','888888',false,10,true);
+    } else {
+      const medalBgs = {1:C.win1,2:C.win2,3:C.win3};
+      const medalFgs = {1:C.win1Fg,2:C.win2Fg,3:C.win3Fg};
+      const medLabels = {1:'🥇 GOLD',2:'🥈 SILVER',3:'🥉 BRONZE'};
+      const placeLabels = {1:'1st Place',2:'2nd Place',3:'3rd Place'};
+      winners.forEach((w,i)=>{
+        const row = [placeLabels[w.rank],medLabels[w.rank],w.m1,w.m2,w.word,parseFloat(w.time.toFixed(1)),'✅ WINNER'];
+        wsData.push(row);
+        row.forEach((_,ci)=>{
+          const s = makeStyle(medalBgs[w.rank],medalFgs[w.rank],true,12,ci<2||ci>5?true:false);
+          s.font.sz = 12;
+          styles[XLSX.utils.encode_cell({r:3+i,c:ci})] = s;
+        });
+      });
+    }
+
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    ws['!merges'] = merges;
+    ws['!cols'] = [{wch:12},{wch:14},{wch:20},{wch:20},{wch:24},{wch:10},{wch:18}];
+    ws['!rows'] = [{hpt:44},{hpt:18},{hpt:22},...winners.map(()=>({hpt:32}))];
+    Object.assign(ws, Object.fromEntries(Object.entries(styles).map(([k,v])=>[k,{...ws[k],s:v}])));
+    XLSX.utils.book_append_sheet(wb, ws, '🏆 Winners');
+  }
+
+  XLSX.writeFile(wb, 'sci_charades_results.xlsx');
+  toast('📊 Excel downloaded successfully!');
+}
+
+// ════════════════════════════════════════════════
+// CSV EXPORT
+// ════════════════════════════════════════════════
+function downloadCSV(){
+  const hdrs = ['#','Team ID','Member 1','Member 2','Word','Round','Difficulty','Time(s)','Qualified','Advanced','Status'];
+  const sorted = [...state.allTeams].sort((a,b)=>a.round!==b.round?a.round-b.round:a.time-b.time);
+  const rows = sorted.map((t,i)=>{
+    const esc = v => String(v).includes(',') ? `"${v}"` : v;
+    const status = t.dq?'Disqualified':t.rank===1?'1st Place':t.rank===2?'2nd Place':t.rank===3?'3rd Place':t.advanced?'Advanced':t.qualified?'Qualified':'Eliminated';
+    return [i+1,`T${String(t.id).padStart(3,'0')}`,t.m1,t.m2,t.word,t.round,t.roundLabel,t.time.toFixed(1),t.qualified&&!t.dq?'Yes':'No',t.advanced?'Yes':'No',status].map(esc).join(',');
+  });
+  const csv = '\uFEFF' + [hdrs.join(','),...rows].join('\n');
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download='sci_charades_results.csv';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+  toast('⬇ CSV downloaded!');
+}
+</script>
+</body>
+</html>
