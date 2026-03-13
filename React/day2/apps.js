@@ -9,7 +9,9 @@ import ReactDOM from "react-dom/client";
 //     document.body.appendChild(button);
 // }
 
-const button = document.querySelector(".button");
-button.addEventListener('click',() =>{
+// const button = document.querySelector(".button");
+// button.addEventListener('click',() =>{
     
-})
+// })
+
+
