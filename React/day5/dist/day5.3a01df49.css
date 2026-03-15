@@ -1,0 +1,57 @@
+body {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.heading {
+  justify-content: space-between;
+  margin-bottom: 10px;
+  display: flex;
+}
+
+.images {
+  position: relative;
+  left: 60px;
+}
+
+.option {
+  padding-top: 20px;
+}
+
+.but, .pro {
+  background-color: #fff;
+  border: none;
+  height: 10px;
+  margin-right: 10px;
+}
+
+.searchbar {
+  border-radius: 10px;
+  width: 300px;
+  height: 30px;
+  position: relative;
+  top: 13px;
+}
+
+.profile {
+  padding-top: 20px;
+  padding-right: 20px;
+}
+
+.middle {
+  background-color: #f8e8d5;
+  justify-content: center;
+  padding-top: 50px;
+  padding-left: 50px;
+  padding-right: 50px;
+}
+
+.card {
+  background-color: #556bc4;
+}
+
+#card_img {
+  margin: 3px;
+}
+/*# sourceMappingURL=day5.3a01df49.css.map */
